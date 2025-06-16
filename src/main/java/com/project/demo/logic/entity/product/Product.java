@@ -1,45 +1,52 @@
 package com.project.demo.logic.entity.product;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.project.demo.logic.entity.category.Category;
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Table(name = "product")
 @Entity
+@Table(name = "products")
 public class Product {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 150)
+    @Column(unique = true)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
-
-    @Column(nullable = false)
     private Integer stock;
 
-    @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
     private Category category;
 
-    public Product() {}
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = new Date();
+        updatedAt = new Date();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = new Date();
+    }
+
+    public Product() {
+    }
 
     public Product(String name, String description, BigDecimal price, Integer stock, Category category) {
         this.name = name;
@@ -111,16 +118,5 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
-    }
-
-    @Override
-    public String toString() {
-        return "Product{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", price=" + price +
-                ", stock=" + stock +
-                ", category=" + (category != null ? category.getName() : "null") +
-                '}';
     }
 }

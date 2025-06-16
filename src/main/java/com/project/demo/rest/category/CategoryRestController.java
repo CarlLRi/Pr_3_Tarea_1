@@ -92,7 +92,7 @@ public class CategoryRestController {
         if(foundCategory.isPresent()) {
             categoryRepository.deleteById(categoryId);
             return new GlobalResponseHandler().handleResponse("Category deleted successfully",
-                    null, HttpStatus.OK, request); // Puedes devolver foundCategory.get() si lo prefieres
+                    null, HttpStatus.OK, request);
         } else {
             return new GlobalResponseHandler().handleResponse("Category id " + categoryId + " not found"  ,
                     HttpStatus.NOT_FOUND, request);
